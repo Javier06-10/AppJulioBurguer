@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "355203518916",
+    "project_id": "julioburguerpizza",
+    "storage_bucket": "julioburguerpizza.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:355203518916:android:e808f9a574c1b7fbb69491",
+        "android_client_info": {
+          "package_name": "com.example.flutter_julioburguer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADiSp_BgzayrqLZTPIy3RbhrXxFODSqLQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:355203518916:android:39fb16d53b569d26b69491",
+        "android_client_info": {
+          "package_name": "julio.burguer.pizza"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADiSp_BgzayrqLZTPIy3RbhrXxFODSqLQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
