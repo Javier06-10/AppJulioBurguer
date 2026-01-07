@@ -15,7 +15,7 @@ class ProductsScreen extends StatefulWidget {
 
   const ProductsScreen({
     super.key,
-    required this.categoryRef  ,
+    required this.categoryRef,
     required this.categoryName,
   });
 
@@ -97,8 +97,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.receipt_long,
-                                  color: Colors.orange),
+                              icon: const Icon(
+                                Icons.receipt_long,
+                                color: Colors.orange,
+                              ),
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -109,8 +111,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               },
                             ),
                             IconButton(
-                              icon: const Icon(Icons.person,
-                                  color: Colors.orange),
+                              icon: const Icon(
+                                Icons.person,
+                                color: Colors.orange,
+                              ),
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -152,7 +156,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                           ),
                                         ),
                                       ),
-                                    )
+                                    ),
                                 ],
                               ),
                             ),
@@ -173,10 +177,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       },
                       decoration: InputDecoration(
                         hintText: 'Buscar productos...',
-                        hintStyle:
-                            TextStyle(color: Colors.grey.shade500),
-                        prefixIcon: const Icon(Icons.search,
-                            color: Colors.orange),
+                        hintStyle: TextStyle(color: Colors.grey.shade500),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.orange,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
@@ -195,14 +200,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     widget.categoryRef,
                   ),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const Center(
-                          child: CircularProgressIndicator());
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (!snapshot.hasData ||
-                        snapshot.data!.isEmpty) {
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return const Center(
                         child: Text(
                           'No hay productos disponibles',
@@ -215,13 +217,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                     if (searchQuery.isNotEmpty) {
                       productos = productos
-                          .where((p) =>
-                              p.nombre
-                                  .toLowerCase()
-                                  .contains(searchQuery) ||
-                              p.descripcion
-                                  .toLowerCase()
-                                  .contains(searchQuery))
+                          .where(
+                            (p) =>
+                                p.nombre.toLowerCase().contains(searchQuery) ||
+                                p.descripcion.toLowerCase().contains(
+                                  searchQuery,
+                                ),
+                          )
                           .toList();
                     }
 
@@ -237,33 +239,30 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    ProductDetailScreen(product: p),
+                                builder: (_) => ProductDetailScreen(product: p),
                               ),
                             );
                           },
                           child: Card(
                             color: Colors.white.withOpacity(0.05),
-                            margin:
-                                const EdgeInsets.only(bottom: 15),
+                            margin: const EdgeInsets.only(bottom: 15),
                             child: ListTile(
-                              leading: const Icon(Icons.fastfood,
-                                  color: Colors.orange),
+                              leading: const Icon(
+                                Icons.fastfood,
+                                color: Colors.orange,
+                              ),
                               title: Text(
                                 p.nombre,
-                                style: const TextStyle(
-                                    color: Colors.white),
+                                style: const TextStyle(color: Colors.white),
                               ),
                               subtitle: Text(
                                 p.descripcion,
-                                style: const TextStyle(
-                                    color: Colors.grey),
+                                style: const TextStyle(color: Colors.grey),
                               ),
                               trailing: isOutOfStock
                                   ? const Text(
                                       'Agotado',
-                                      style: TextStyle(
-                                          color: Colors.red),
+                                      style: TextStyle(color: Colors.red),
                                     )
                                   : IconButton(
                                       icon: const Icon(

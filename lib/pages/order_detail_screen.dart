@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_julioburguer/services/order_progress_service.dart';
 import 'package:intl/intl.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final QueryDocumentSnapshot order;
 
+
+
+
   const OrderDetailScreen({super.key, required this.order});
+
+
 
   Color statusColor(String status) {
     switch (status) {
@@ -27,15 +33,25 @@ class OrderDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = order.data() as Map<String, dynamic>;
+      final OrderProgressService progressService = OrderProgressService();
 
     final String status = data['status'] ?? 'pending';
     final double total = (data['total'] as num?)?.toDouble() ?? 0.0;
     final Timestamp? createdAt = data['createdAt'];
     final description = data['description']?.toString();
-    
+    final int tiempoEstimado = data['tiempoEstimado'] ?? 0;
+
+    final bool isDelayed = createdAt != null
+    ? progressService.isOrderDelayed(
+        createdAt: createdAt,
+        tiempoEstimado: tiempoEstimado,
+      )
+    : false;
 
     final List items =
         data['items'] is List ? data['items'] as List : [];
+
+        
 
     return Scaffold(
       appBar: AppBar(
@@ -57,6 +73,33 @@ class OrderDetailScreen extends StatelessWidget {
               ),
               backgroundColor: statusColor(status),
             ),
+
+            if (isDelayed) ...[
+  const SizedBox(height: 10),
+  Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.red.shade700,
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Row(
+      children: const [
+        Icon(Icons.timer_off, color: Colors.white),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            'Tu pedido está tardando más de lo estimado',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+],
+
 
             const SizedBox(height: 10),
 
@@ -135,8 +178,12 @@ if (description != null && description.isNotEmpty) ...[
     final double price =
         (item['precio'] as num?)?.toDouble() ?? 0.0;
 
-    final int quantity =
+        final int quantity =
         (item['cantidad'] as num?)?.toInt() ?? 0;
+
+        
+        
+
 
     return Card(
       elevation: 2,
