@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../services/order_service.dart';
+import '../widgets/checkout_sheet.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -100,15 +101,20 @@ class _CartScreenState extends State<CartScreen> {
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: () async {
+                          final checkout =
+                              await showCheckoutSheet(context, cart.total);
+                          if (checkout == null) return;
+
                           await orderService.createOrder(
                             items: cart.items.values.toList(),
                             total: cart.total,
                             tiempoEstimado: tiempoEstimado,
                             description: descriptionCtrl.text.trim(),
+                            checkout: checkout,
                           );
 
                           cart.clear();
-                          if (mounted) Navigator.pop(context);
+                          if (context.mounted) Navigator.pop(context);
                         },
                         child: const Text('Confirmar Pedido'),
                       ),
