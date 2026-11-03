@@ -1,0 +1,38 @@
+# Blueprint de Render para la app de clientes (Flutter web / PWA).
+# Render → New → Blueprint → elige este repositorio.
+services:
+  - type: web
+    name: djulio-app
+    runtime: static
+    branch: main
+    buildCommand: bash render-build.sh
+    staticPublishPath: build/web
+    autoDeploy: true
+    envVars:
+      - key: FLUTTER_VERSION
+        value: "3.38.5"
+    # La app usa rutas con # (/#/products), pero cualquier ruta debe abrir la app
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      # Archivos que cambian en cada versión: siempre frescos
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /flutter_bootstrap.js
+        name: Cache-Control
+        value: no-cache
+      - path: /flutter_service_worker.js
+        name: Cache-Control
+        value: no-cache
+      - path: /manifest.json
+        name: Cache-Control
+        value: no-cache
+      - path: /version.json
+        name: Cache-Control
+        value: no-cache
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
