@@ -1,3 +1,5 @@
+import 'package:latlong2/latlong.dart';
+
 /// Datos de entrega y pago que el cliente indica al confirmar el pedido.
 /// Se guardan dentro del pedido (`orders.entrega` y `orders.pago`) para que
 /// el repartidor los vea sin depender del perfil del usuario.
@@ -19,6 +21,9 @@ class CheckoutData {
   final String telefono;
   final String direccion;
   final String referencia;
+
+  /// Punto exacto elegido en el mapa (solo delivery).
+  final LatLng? ubicacion;
   final MetodoPago metodoPago;
 
   /// Billete con el que paga (solo efectivo). null = paga exacto.
@@ -32,6 +37,7 @@ class CheckoutData {
     required this.referencia,
     required this.metodoPago,
     this.pagaCon,
+    this.ubicacion,
   });
 
   double devuelta(double total) =>
@@ -43,6 +49,8 @@ class CheckoutData {
     'telefono': telefono,
     'direccion': tipo == TipoEntrega.delivery ? direccion : '',
     'referencia': tipo == TipoEntrega.delivery ? referencia : '',
+    if (tipo == TipoEntrega.delivery && ubicacion != null)
+      'ubicacion': {'lat': ubicacion!.latitude, 'lng': ubicacion!.longitude},
   };
 
   Map<String, dynamic> pagoMap(double total) => {

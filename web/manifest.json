@@ -1,12 +1,16 @@
 {
-    "name": "flutter_julioburguer",
-    "short_name": "flutter_julioburguer",
-    "start_url": ".",
+    "id": "/",
+    "name": "D'Julio Burger Pizza",
+    "short_name": "D'Julio",
+    "description": "Pide hamburguesas y pizzas de D'Julio y sigue tu pedido en tiempo real.",
+    "lang": "es",
+    "start_url": "./",
+    "scope": "./",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
     "orientation": "portrait-primary",
+    "background_color": "#0E0D0C",
+    "theme_color": "#0E0D0C",
+    "categories": ["food", "shopping"],
     "prefer_related_applications": false,
     "icons": [
         {
