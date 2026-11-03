@@ -1,1 +1,40 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"julioburguerpizza","appId":"1:355203518916:android:e808f9a574c1b7fbb69491","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"julioburguerpizza","configurations":{"android":"1:355203518916:android:e808f9a574c1b7fbb69491","ios":"1:355203518916:ios:bf9357c086b9025fb69491","macos":"1:355203518916:ios:bf9357c086b9025fb69491","web":"1:355203518916:web:466595a3c1ede73eb69491","windows":"1:355203518916:web:f4631ede8ac7434db69491"}}}}}}
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [{ "source": "**", "destination": "/index.html" }],
+    "headers": [
+      {
+        "source": "/@(index.html|flutter_bootstrap.js|flutter_service_worker.js|manifest.json|version.json)",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      },
+      {
+        "source": "**/*.@(js|wasm|mjs|png|jpg|svg|ttf|otf|woff2|json)",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "julioburguerpizza",
+          "appId": "1:355203518916:android:e808f9a574c1b7fbb69491",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "julioburguerpizza",
+          "configurations": {
+            "android": "1:355203518916:android:e808f9a574c1b7fbb69491",
+            "ios": "1:355203518916:ios:bf9357c086b9025fb69491",
+            "macos": "1:355203518916:ios:bf9357c086b9025fb69491",
+            "web": "1:355203518916:web:466595a3c1ede73eb69491",
+            "windows": "1:355203518916:web:f4631ede8ac7434db69491"
+          }
+        }
+      }
+    }
+  }
+}

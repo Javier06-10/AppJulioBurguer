@@ -1,38 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
     href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
+    The value is replaced by the `--base-href` argument of `flutter build web`.
   -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Pide hamburguesas y pizzas de D'Julio y sigue tu pedido en tiempo real.">
+  <meta name="theme-color" content="#0E0D0C">
 
-  <!-- iOS meta tags & icons -->
+  <!-- Instalable en iOS / Android -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="flutter_julioburguer">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="D'Julio">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>flutter_julioburguer</title>
   <link rel="manifest" href="manifest.json">
+
+  <title>D'Julio Burger Pizza</title>
+
+  <!-- Pantalla de carga mientras arranca Flutter -->
+  <style>
+    html, body { margin: 0; height: 100%; background: #0E0D0C; }
+    #splash {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+      background: radial-gradient(circle at 50% 35%, rgba(255,122,26,.18), transparent 55%), #0E0D0C;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      transition: opacity .35s ease;
+    }
+    #splash.hide { opacity: 0; pointer-events: none; }
+    #splash img {
+      width: 96px; height: 96px; border-radius: 24px;
+      box-shadow: 0 18px 48px rgba(255,122,26,.35);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    #splash h1 { margin: 0; color: #F6F2EE; font-size: 26px; letter-spacing: .5px; }
+    #splash p { margin: -10px 0 0; color: #FF8A3D; font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; }
+    #splash .bar { width: 120px; height: 3px; border-radius: 3px; background: #2E2A26; overflow: hidden; margin-top: 6px; }
+    #splash .bar::after {
+      content: ""; display: block; width: 40%; height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, #FF7A1A, #E8471C);
+      animation: load 1.1s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { transform: scale(1.06); } }
+    @keyframes load { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+  </style>
 </head>
 <body>
+  <div id="splash" role="status" aria-label="Cargando D'Julio">
+    <img src="icons/Icon-192.png" alt="">
+    <h1>D'Julio</h1>
+    <p>Burger · Pizza</p>
+    <div class="bar"></div>
+  </div>
+
+  <script>
+    // Quita la pantalla de carga cuando Flutter pinta su primer cuadro
+    window.addEventListener("flutter-first-frame", function () {
+      var s = document.getElementById("splash");
+      if (!s) return;
+      s.classList.add("hide");
+      setTimeout(function () { s.remove(); }, 400);
+    });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
