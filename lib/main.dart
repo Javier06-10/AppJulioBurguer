@@ -7,9 +7,7 @@ import 'package:flutter_julioburguer/pages/profile_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
-import 'pages/admin/admin_shell.dart';
 import 'providers/cart_provider.dart';
-import 'services/admin_service.dart';
 import 'theme/app_theme.dart';
 import 'pages/login_screen.dart';
 import 'pages/register_screen.dart';
@@ -22,16 +20,10 @@ void main() async {
   runApp(MyApp(initialRoute: await _initialRoute()));
 }
 
-/// Si ya hay sesión guardada (p. ej. al abrir la app instalada), entra directo.
+/// Si ya hay sesión guardada (p. ej. al abrir la app instalada), entra directo al menú.
 Future<String> _initialRoute() async {
   final user = await FirebaseAuth.instance.authStateChanges().first;
-  if (user == null) return '/login';
-  try {
-    final role = await AdminService().getRole(user.uid);
-    return role == 'admin' ? '/admin' : '/products';
-  } catch (_) {
-    return '/products';
-  }
+  return user == null ? '/login' : '/products';
 }
 
 final categoriaRef = FirebaseFirestore.instance
@@ -62,7 +54,6 @@ class MyApp extends StatelessWidget {
 
           '/cart': (context) => const CartScreen(),
           '/profile': (_) => const ProfileScreen(),
-          '/admin': (_) => const AdminShell(),
         },
         onUnknownRoute: (settings) {
           return MaterialPageRoute(builder: (context) => const LoginScreen());
