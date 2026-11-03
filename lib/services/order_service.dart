@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../models/checkout_data.dart';
 import '../models/models/cart_item.dart';
 
 class OrderService {
@@ -21,7 +22,7 @@ class OrderService {
     required double total,
      required int tiempoEstimado,
     required String description,
-   
+    required CheckoutData checkout,
   }) async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -39,6 +40,8 @@ class OrderService {
       'total': total,
       'tiempoEstimado': tiempoEstimado,
       'description': description,
+      'entrega': checkout.entregaMap(),
+      'pago': checkout.pagoMap(total),
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
     });
