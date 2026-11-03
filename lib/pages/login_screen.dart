@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_julioburguer/pages/products_screen.dart';
 import 'package:flutter_julioburguer/pages/register_screen.dart';
+import '../services/admin_service.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -44,14 +45,21 @@ class _LoginScreenState extends State<LoginScreen> {
         passCtrl.text.trim(),
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) =>  ProductsScreen(
+      final uid = authService.currentUser!.uid;
+      final role = await AdminService().getRole(uid);
+      if (!mounted) return;
 
-          categoryRef: categoriaRef,
-          categoryName: '',
-        )),
-      );
+      if (role == 'admin') {
+        Navigator.pushReplacementNamed(context, '/admin');
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) =>  ProductsScreen(
+            categoryRef: categoriaRef,
+            categoryName: '',
+          )),
+        );
+      }
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -61,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     }
-    setState(() => loading = false);
+    if (mounted) setState(() => loading = false);
   }
 
   @override
