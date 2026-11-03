@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_julioburguer/pages/cart_screen.dart';
-import 'package:flutter_julioburguer/pages/orders_screen.dart';
 import 'package:flutter_julioburguer/pages/product_detail_screen.dart';
-import 'package:flutter_julioburguer/pages/profile_screen.dart';
+import '../widgets/bottom_nav.dart';
 import '../services/product_service.dart';
 import '../models/product_model.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +29,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
     final productService = ProductService();
 
     return Scaffold(
+      extendBody: true,
+      floatingActionButton: const CartFab(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: const AppBottomBar(),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -89,76 +91,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   ),
                                 ),
                               ],
-                            ),
-                          ],
-                        ),
-
-                        // ICONOS
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.receipt_long,
-                                color: Colors.orange,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const OrdersScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.person,
-                                color: Colors.orange,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const ProfileScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                            Consumer<CartProvider>(
-                              builder: (_, cart, __) => Stack(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.shopping_cart,
-                                      color: Colors.orange,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => const CartScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  if (cart.totalItems > 0)
-                                    Positioned(
-                                      right: 4,
-                                      top: 4,
-                                      child: CircleAvatar(
-                                        radius: 9,
-                                        backgroundColor: Colors.red,
-                                        child: Text(
-                                          cart.totalItems.toString(),
-                                          style: const TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
                             ),
                           ],
                         ),
@@ -228,7 +160,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     }
 
                     return ListView.builder(
-                      padding: const EdgeInsets.all(15),
+                      // espacio extra para la barra inferior flotante
+                      padding: const EdgeInsets.fromLTRB(15, 15, 15, 110),
                       itemCount: productos.length,
                       itemBuilder: (context, index) {
                         final p = productos[index];

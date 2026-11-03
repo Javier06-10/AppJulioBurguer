@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../services/location_service.dart';
+import '../widgets/location_card.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -12,9 +14,7 @@ class ProfileScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mi Perfil'),
-      ),
+      appBar: AppBar(title: const Text('Mi Perfil')),
       body: user == null
           ? const Center(child: Text('Usuario no autenticado'))
           : StreamBuilder<DocumentSnapshot>(
@@ -24,26 +24,22 @@ class ProfileScreen extends StatelessWidget {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('Error al cargar perfil'),
-                  );
+                  return const Center(child: Text('Error al cargar perfil'));
                 }
 
                 if (!snapshot.hasData || !snapshot.data!.exists) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
-                final data =
-                    snapshot.data!.data() as Map<String, dynamic>;
+                final data = snapshot.data!.data() as Map<String, dynamic>;
 
                 final name = data['name'] ?? data['nombre'] ?? 'Sin nombre';
                 final phone = data['phone'] ?? '';
                 final email = data['email'] ?? user.email ?? '';
-                  final direccion = data['direccion'] ?? '';
+                final direccion = data['direccion'] ?? '';
+                final ubicacion = LocationService.fromMap(data['ubicacion']);
 
-                return Padding(
+                return SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,23 +71,16 @@ class ProfileScreen extends StatelessWidget {
                       // ✉️ EMAIL
                       Text(
                         email,
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),
-
+                        style: TextStyle(color: Colors.grey.shade600),
                       ),
 
                       const SizedBox(height: 6),
 
                       // 📞 TELÉFONO
                       SelectableText(
-                        phone.isEmpty
-                            ? 'Teléfono no registrado'
-                            : phone,
+                        phone.isEmpty ? 'Teléfono no registrado' : phone,
                         style: TextStyle(
-                          color: phone.isEmpty
-                              ? Colors.red
-                              : Colors.grey,
+                          color: phone.isEmpty ? Colors.red : Colors.grey,
                         ),
                         toolbarOptions: const ToolbarOptions(
                           copy: true,
@@ -99,17 +88,20 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         showCursor: false,
                       ),
-                      
-                       // 🏠 DIRECCIÓN
+
+                      // 🏠 DIRECCIÓN
                       ListTile(
                         leading: const Icon(Icons.location_on),
                         title: const Text('Dirección'),
                         subtitle: Text(
-                          direccion.isEmpty
-                              ? 'No registrada'
-                              : direccion,
+                          direccion.isEmpty ? 'No registrada' : direccion,
                         ),
                       ),
+
+                      const SizedBox(height: 8),
+
+                      // 📍 UBICACIÓN EN EL MAPA (el perfil se actualiza solo por el stream)
+                      LocationCard(location: ubicacion),
 
                       const SizedBox(height: 30),
 
@@ -123,8 +115,7 @@ class ProfileScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    const EditProfileScreen(),
+                                builder: (_) => const EditProfileScreen(),
                               ),
                             );
                           },

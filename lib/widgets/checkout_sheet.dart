@@ -3,8 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:latlong2/latlong.dart';
+
 import '../models/checkout_data.dart';
+import '../services/location_service.dart';
 import '../theme/app_theme.dart';
+import 'location_card.dart';
 
 /// Abre la hoja de confirmación y devuelve los datos elegidos (o null si se cancela).
 Future<CheckoutData?> showCheckoutSheet(BuildContext context, double total) {
@@ -36,6 +40,7 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
 
   TipoEntrega _tipo = TipoEntrega.delivery;
   MetodoPago _metodo = MetodoPago.efectivo;
+  LatLng? _ubicacion;
   bool _loading = true;
 
   @override
@@ -56,6 +61,7 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
       _nombre.text = (d['name'] ?? d['nombre'] ?? '').toString();
       _telefono.text = (d['phone'] ?? '').toString();
       _direccion.text = (d['direccion'] ?? '').toString();
+      _ubicacion = LocationService.fromMap(d['ubicacion']);
     }
     if (mounted) setState(() => _loading = false);
   }
@@ -93,6 +99,7 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
         referencia: _referencia.text.trim(),
         metodoPago: _metodo,
         pagaCon: _metodo == MetodoPago.efectivo ? _pagaConValue : null,
+        ubicacion: _ubicacion,
       ),
     );
   }
@@ -195,6 +202,11 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
                   hintText: 'Ej: casa verde frente al colmado',
                   prefixIcon: Icon(Icons.flag_outlined),
                 ),
+              ),
+              const SizedBox(height: 12),
+              LocationCard(
+                location: _ubicacion,
+                onChanged: (p) => setState(() => _ubicacion = p),
               ),
             ],
 
