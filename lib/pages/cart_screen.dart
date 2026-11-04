@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../services/order_service.dart';
 import '../widgets/checkout_sheet.dart';
+import '../widgets/verify_email_dialog.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -14,6 +15,47 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final TextEditingController descriptionCtrl = TextEditingController();
   final OrderService orderService = OrderService();
+  bool _sending = false;
+
+  Future<void> _confirmOrder(CartProvider cart, int tiempoEstimado) async {
+    if (!await ensureVerifiedEmail(context) || !mounted) return;
+
+    final checkout = await showCheckoutSheet(context, cart.total);
+    if (checkout == null || !mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _sending = true);
+    try {
+      await orderService.createOrder(
+        items: cart.items.values.toList(),
+        total: cart.total,
+        tiempoEstimado: tiempoEstimado,
+        description: descriptionCtrl.text.trim(),
+        checkout: checkout,
+      );
+      cart.clear();
+      if (mounted) Navigator.pop(context);
+      messenger.showSnackBar(
+        const SnackBar(content: Text('¡Pedido enviado! Te avisaremos cuando esté listo.')),
+      );
+    } on OrderRejected catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(e.message), backgroundColor: Colors.orange.shade800),
+      );
+    } catch (e) {
+      debugPrint('Error creando pedido: $e');
+      messenger.showSnackBar(
+        SnackBar(
+          content: const Text(
+            'No se pudo enviar el pedido. Revisa tu conexión e inténtalo de nuevo.',
+          ),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -100,23 +142,16 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       const SizedBox(height: 12),
                       ElevatedButton(
-                        onPressed: () async {
-                          final checkout =
-                              await showCheckoutSheet(context, cart.total);
-                          if (checkout == null) return;
-
-                          await orderService.createOrder(
-                            items: cart.items.values.toList(),
-                            total: cart.total,
-                            tiempoEstimado: tiempoEstimado,
-                            description: descriptionCtrl.text.trim(),
-                            checkout: checkout,
-                          );
-
-                          cart.clear();
-                          if (context.mounted) Navigator.pop(context);
-                        },
-                        child: const Text('Confirmar Pedido'),
+                        onPressed: _sending
+                            ? null
+                            : () => _confirmOrder(cart, tiempoEstimado),
+                        child: _sending
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Text('Confirmar Pedido'),
                       ),
                     ],
                   ),
