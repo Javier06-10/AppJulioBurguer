@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_julioburguer/pages/products_screen.dart';
 import 'package:flutter_julioburguer/pages/register_screen.dart';
+import '../services/auth_errors.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -57,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al iniciar sesión: ${e.toString()}'),
+          content: Text(authErrorMessage(e)),
           backgroundColor: Colors.red.shade700,
         ),
       );
