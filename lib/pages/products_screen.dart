@@ -10,6 +10,7 @@ import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/product_image.dart';
 import 'product_detail_screen.dart';
+import '../widgets/store_closed_banner.dart';
 
 /// Pantalla principal de la tienda: saludo, buscador, categorías y menú.
 class ProductsScreen extends StatefulWidget {
@@ -124,6 +125,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 return CustomScrollView(
                   slivers: [
                     SliverToBoxAdapter(child: _header(context)),
+                    const SliverToBoxAdapter(child: StoreClosedBanner()),
                     SliverToBoxAdapter(child: _searchField()),
                     if (cats.isNotEmpty)
                       SliverToBoxAdapter(child: _categoryChips(cats, selected)),

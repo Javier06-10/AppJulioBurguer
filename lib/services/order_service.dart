@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/checkout_data.dart';
 import '../models/models/cart_item.dart';
+import 'store_status.dart';
 
 /// Límites contra pedidos falsos. Deben coincidir con las reglas de
 /// Firestore (`minutosEntrePedidos` y `maxPedidosPorDia`), que son las que
@@ -80,6 +81,17 @@ class OrderService {
     final orderRef = _firestore.collection('orders').doc();
 
     await _firestore.runTransaction((tx) async {
+      final negocio = StoreStatus.fromMap(
+        (await tx.get(_firestore.collection('config').doc('negocio'))).data(),
+      );
+      if (!negocio.abierto) {
+        throw OrderRejected(
+          'Estamos cerrados ahora mismo.'
+          '${negocio.mensaje.isNotEmpty ? ' ${negocio.mensaje}' : ''} '
+          'Tu carrito queda guardado para cuando abramos.',
+        );
+      }
+
       final snap = await tx.get(userRef);
       if (!snap.exists) {
         throw const OrderRejected(
