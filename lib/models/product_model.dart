@@ -9,7 +9,8 @@ class Product {
   final int tiempoPreparacion;
 
   final bool activo;
-  final DocumentReference categoriaId;
+  final DocumentReference? categoriaId;
+  final String imagen;
 
   Product({
     required this.id,
@@ -20,6 +21,7 @@ class Product {
     required this.activo,
     required this.categoriaId,
     required this.tiempoPreparacion,
+    this.imagen = '',
   });
 
   factory Product.fromFirestore(
@@ -32,10 +34,13 @@ class Product {
       nombre: data['nombre'] ?? '',
       descripcion: data['descripcion'] ?? '',
       precio: (data['precio'] ?? 0).toDouble(),
-      stock: data['stock'] ?? 0,
+      stock: ((data['stock'] ?? 0) as num).toInt(),
       activo: data['activo'] ?? false,
-      categoriaId: data['categoriaId'],
-      tiempoPreparacion: data['tiempoPreparacion'] ?? 10,
+      categoriaId: data['categoriaId'] is DocumentReference
+          ? data['categoriaId'] as DocumentReference
+          : null,
+      tiempoPreparacion: ((data['tiempoPreparacion'] ?? 10) as num).toInt(),
+      imagen: (data['imagen'] ?? '').toString().trim(),
 
     );
   }
