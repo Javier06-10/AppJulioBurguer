@@ -29,18 +29,23 @@ class ProductImage extends StatelessWidget {
   final double size;
   final double radius;
 
+  /// Ancho opcional (por ejemplo `double.infinity` para una portada).
+  final double? width;
+
   const ProductImage({
     super.key,
     required this.url,
     required this.nombre,
     this.size = 84,
     this.radius = 14,
+    this.width,
   });
 
   @override
   Widget build(BuildContext context) {
+    final w = width ?? size;
     final placeholder = Container(
-      width: size,
+      width: w,
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -53,7 +58,7 @@ class ProductImage extends StatelessWidget {
           ],
         ),
       ),
-      child: Icon(foodIcon(nombre), color: AppColors.primary, size: size * 0.45),
+      child: Icon(foodIcon(nombre), color: AppColors.primary, size: (size * 0.45).clamp(24, 140).toDouble()),
     );
 
     return ClipRRect(
@@ -61,7 +66,7 @@ class ProductImage extends StatelessWidget {
       child: url.startsWith('https://')
           ? Image.network(
               url,
-              width: size,
+              width: w,
               height: size,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => placeholder,
