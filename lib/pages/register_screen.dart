@@ -67,7 +67,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('¡Cuenta creada exitosamente!'),
+          content: const Text('¡Cuenta creada! Te enviamos un correo para verificarla.'),
           backgroundColor: Colors.green.shade700,
         ),
       );

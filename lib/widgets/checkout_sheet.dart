@@ -171,11 +171,14 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
                 labelText: 'Teléfono / WhatsApp',
                 prefixIcon: Icon(Icons.phone_outlined),
               ),
-              validator: (v) =>
-                  _tipo == TipoEntrega.delivery &&
-                      (v == null || v.trim().length < 7)
-                  ? 'El repartidor necesita tu teléfono'
-                  : null,
+              validator: (v) {
+                final digits = (v ?? '').replaceAll(RegExp(r'\D'), '');
+                if (digits.length < 7) {
+                  return 'Escribe tu teléfono: te llamamos para confirmar el pedido';
+                }
+                if ((v ?? '').trim().length > 30) return 'Teléfono demasiado largo';
+                return null;
+              },
             ),
 
             if (_tipo == TipoEntrega.delivery) ...[

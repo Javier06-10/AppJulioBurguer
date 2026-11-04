@@ -28,6 +28,13 @@ class AuthService {
       'rol': 'cliente',
       'createdAt': FieldValue.serverTimestamp(),
     });
+
+    // 3️⃣ Enlace para verificar el correo (necesario para hacer pedidos)
+    try {
+      await cred.user!.sendEmailVerification();
+    } catch (_) {
+      // Si falla, se puede reenviar al momento de pedir.
+    }
   }
 
   /// LOGIN
