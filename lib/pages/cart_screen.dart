@@ -4,6 +4,8 @@ import '../providers/cart_provider.dart';
 import '../services/order_service.dart';
 import '../widgets/checkout_sheet.dart';
 import '../widgets/verify_email_dialog.dart';
+import '../services/store_status.dart';
+import '../widgets/store_closed_banner.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -36,11 +38,16 @@ class _CartScreenState extends State<CartScreen> {
       cart.clear();
       if (mounted) Navigator.pop(context);
       messenger.showSnackBar(
-        const SnackBar(content: Text('¡Pedido enviado! Te avisaremos cuando esté listo.')),
+        const SnackBar(
+          content: Text('¡Pedido enviado! Te avisaremos cuando esté listo.'),
+        ),
       );
     } on OrderRejected catch (e) {
       messenger.showSnackBar(
-        SnackBar(content: Text(e.message), backgroundColor: Colors.orange.shade800),
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.orange.shade800,
+        ),
       );
     } catch (e) {
       debugPrint('Error creando pedido: $e');
@@ -141,17 +148,37 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: _sending
-                            ? null
-                            : () => _confirmOrder(cart, tiempoEstimado),
-                        child: _sending
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Text('Confirmar Pedido'),
+                      StreamBuilder<StoreStatus>(
+                        stream: storeStatusStream(),
+                        builder: (context, snap) {
+                          final negocio = snap.data ?? StoreStatus.open;
+                          return Column(
+                            children: [
+                              if (!negocio.abierto) ...[
+                                StoreClosedCard(status: negocio),
+                                const SizedBox(height: 12),
+                              ],
+                              ElevatedButton(
+                                onPressed: _sending || !negocio.abierto
+                                    ? null
+                                    : () => _confirmOrder(cart, tiempoEstimado),
+                                child: _sending
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Text(
+                                        negocio.abierto
+                                            ? 'Confirmar Pedido'
+                                            : 'Cerrado por ahora',
+                                      ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ],
                   ),
