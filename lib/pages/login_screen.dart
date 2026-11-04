@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_julioburguer/pages/products_screen.dart';
 import 'package:flutter_julioburguer/pages/register_screen.dart';
@@ -11,10 +10,6 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
-
-  final categoriaRef = FirebaseFirestore.instance
-    .collection('categories')
-    .doc('b5cxNnNwBfmVQUWQUhib');
 
 class _LoginScreenState extends State<LoginScreen> {
   final emailCtrl = TextEditingController();
@@ -49,10 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) =>  ProductsScreen(
-          categoryRef: categoriaRef,
-          categoryName: '',
-        )),
+        MaterialPageRoute(builder: (_) => const ProductsScreen()),
       );
 
     } catch (e) {
