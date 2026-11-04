@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_errors.dart';
 import '../services/auth_service.dart';
+import '../widgets/google_sign_in_button.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -361,6 +362,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                         ),
                       ),
+
+                      const SizedBox(height: 20),
+
+                      Row(
+                        children: [
+                          Expanded(child: Divider(color: Colors.grey.shade700)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: Text(
+                              'O',
+                              style: TextStyle(color: Colors.grey.shade500),
+                            ),
+                          ),
+                          Expanded(child: Divider(color: Colors.grey.shade700)),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      const GoogleSignInButton(),
 
                       const SizedBox(height: 20),
 
