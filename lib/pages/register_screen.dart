@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/auth_errors.dart';
 import '../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -74,7 +75,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al registrar: ${e.toString()}'),
+          content: Text(authErrorMessage(e, registro: true)),
           backgroundColor: Colors.red.shade700,
         ),
       );
