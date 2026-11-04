@@ -5,7 +5,7 @@ services:
     name: djulio-app
     runtime: static
     branch: main
-    buildCommand: bash render-build.sh
+    buildCommand: bash build-web.sh
     staticPublishPath: build/web
     autoDeploy: true
     envVars:
