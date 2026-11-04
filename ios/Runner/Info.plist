@@ -47,5 +47,18 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Regreso a la app después de iniciar sesión con Google -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.355203518916-4fkvun6tnh3g89nu0v9gh7596ch6pot6</string>
+				<string>app-1-355203518916-ios-bf9357c086b9025fb69491</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

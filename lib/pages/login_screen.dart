@@ -3,6 +3,7 @@ import 'package:flutter_julioburguer/pages/products_screen.dart';
 import 'package:flutter_julioburguer/pages/register_screen.dart';
 import '../services/auth_errors.dart';
 import '../services/auth_service.dart';
+import '../widgets/google_sign_in_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -283,7 +284,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     
                     const SizedBox(height: 30),
-                    
+
+                    const GoogleSignInButton(),
+
+                    const SizedBox(height: 16),
+
                     // Botón de crear cuenta
                     Container(
                       width: double.infinity,

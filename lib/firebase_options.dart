@@ -53,6 +53,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '355203518916',
     projectId: 'julioburguerpizza',
     storageBucket: 'julioburguerpizza.firebasestorage.app',
+    iosClientId: '355203518916-4fkvun6tnh3g89nu0v9gh7596ch6pot6.apps.googleusercontent.com',
     iosBundleId: 'com.example.flutterJulioburguer',
   );
 
@@ -62,6 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '355203518916',
     projectId: 'julioburguerpizza',
     storageBucket: 'julioburguerpizza.firebasestorage.app',
+    iosClientId: '355203518916-4fkvun6tnh3g89nu0v9gh7596ch6pot6.apps.googleusercontent.com',
     iosBundleId: 'com.example.flutterJulioburguer',
   );
 

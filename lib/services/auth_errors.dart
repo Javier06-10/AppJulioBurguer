@@ -22,6 +22,13 @@ String authErrorMessage(Object error, {bool registro = false}) {
         return 'Esta cuenta está desactivada';
       case 'too-many-requests':
         return 'Demasiados intentos. Espera unos minutos y vuelve a intentarlo.';
+      case 'popup-blocked':
+        return 'El navegador bloqueó la ventana de Google. Permite las ventanas emergentes e inténtalo otra vez.';
+      case 'account-exists-with-different-credential':
+        return 'Ese correo ya tiene una cuenta. Entra con tu correo y contraseña.';
+      case 'operation-not-allowed':
+      case 'unauthorized-domain':
+        return 'El acceso con Google no está disponible ahora mismo.';
       case 'network-request-failed':
         return 'Sin conexión. Revisa tu internet.';
     }
