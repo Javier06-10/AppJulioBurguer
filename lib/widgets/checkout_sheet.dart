@@ -227,12 +227,12 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
                 maxLines: 2,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(
-                  labelText: 'Dirección de entrega',
-                  hintText: 'Calle, número, sector',
-                  prefixIcon: Icon(Icons.location_on_outlined),
+                  labelText: 'Referencia de ubicación',
+                  hintText: 'Sector, calle y cómo llegar a tu casa',
+                  prefixIcon: Icon(Icons.signpost_outlined),
                 ),
                 validator: (v) => (v == null || v.trim().length < 5)
-                    ? 'Escribe la dirección de entrega'
+                    ? 'Escribe el sector y una referencia para llegar'
                     : null,
               ),
               const SizedBox(height: 12),
@@ -240,8 +240,8 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
                 controller: _referencia,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(
-                  labelText: 'Referencia (opcional)',
-                  hintText: 'Ej: casa verde frente al colmado',
+                  labelText: 'Indicaciones extra (opcional)',
+                  hintText: 'Ej: tocar el timbre, segundo piso',
                   prefixIcon: Icon(Icons.flag_outlined),
                 ),
               ),

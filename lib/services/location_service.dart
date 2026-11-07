@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'location_errors.dart';
+
 /// Ubicación de entrega del cliente, guardada en `users/{uid}.ubicacion`.
 class LocationService {
   final _db = FirebaseFirestore.instance;
@@ -37,36 +39,43 @@ class LocationService {
   Future<void> save(LatLng p) async {
     final user = _auth.currentUser;
     if (user == null) {
-      throw Exception('Inicia sesión para guardar tu ubicación');
+      throw const LocationException(LocationErrorKind.sinSesion);
     }
-    await _db.collection('users').doc(user.uid).update({
-      'ubicacion': {...toMap(p), 'updatedAt': FieldValue.serverTimestamp()},
-    });
+    try {
+      await _db.collection('users').doc(user.uid).update({
+        'ubicacion': {...toMap(p), 'updatedAt': FieldValue.serverTimestamp()},
+      });
+    } catch (e) {
+      throw LocationException.from(e);
+    }
   }
 
-  /// Posición actual del dispositivo. Lanza un mensaje legible si no se puede.
+  /// Posición actual del dispositivo. Si no se puede, lanza una
+  /// [LocationException] con el motivo (GPS apagado, sin permiso, sin señal…).
   Future<LatLng> current() async {
-    if (!await Geolocator.isLocationServiceEnabled()) {
-      throw Exception('Activa la ubicación (GPS) de tu dispositivo');
-    }
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-    if (permission == LocationPermission.denied) {
-      throw Exception('Necesitamos permiso de ubicación para encontrarte');
-    }
-    if (permission == LocationPermission.deniedForever) {
-      throw Exception(
-        'El permiso de ubicación está bloqueado. Actívalo en los ajustes del navegador o del teléfono',
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        throw const LocationException(LocationErrorKind.gpsApagado);
+      }
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        throw const LocationException(LocationErrorKind.permisoDenegado);
+      }
+      if (permission == LocationPermission.deniedForever) {
+        throw const LocationException(LocationErrorKind.permisoBloqueado);
+      }
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
       );
+      return LatLng(pos.latitude, pos.longitude);
+    } catch (e) {
+      throw LocationException.from(e);
     }
-    final pos = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 15),
-      ),
-    );
-    return LatLng(pos.latitude, pos.longitude);
   }
 }

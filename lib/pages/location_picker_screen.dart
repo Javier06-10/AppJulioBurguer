@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../services/delivery_zone.dart';
+import '../services/location_errors.dart';
 import '../services/location_service.dart';
 import '../theme/app_theme.dart';
 
@@ -47,27 +48,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     try {
       final me = await _location.current();
       if (!DeliveryZone.contiene(me)) {
-        if (!silent && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Estás fuera de nuestra zona de delivery '
-                '(${DeliveryZone.nombre}). Mueve el mapa hasta tu puerta '
-                'o recoge en el local.',
-              ),
-            ),
-          );
-        }
-        return;
+        throw const LocationException(LocationErrorKind.fueraDeZona);
       }
       _map.move(me, 17);
       setState(() => _center = me);
     } catch (e) {
-      if (!silent && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
-        );
-      }
+      // Al abrir el mapa no molestamos: el cliente puede moverlo a mano
+      if (!silent && mounted) await showLocationError(context, e);
     } finally {
       if (mounted) setState(() => _locating = false);
     }

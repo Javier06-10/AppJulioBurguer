@@ -108,9 +108,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     // 🏠 DIRECCIÓN
                     TextFormField(
                       controller: _addressController,
+                      minLines: 1,
+                      maxLines: 3,
+                      maxLength: 300,
+                      textCapitalization: TextCapitalization.sentences,
                       decoration: const InputDecoration(
-                        labelText: 'Dirección',
-                        prefixIcon: Icon(Icons.location_on),
+                        labelText: 'Referencia de ubicación',
+                        hintText: 'Sector, calle y cómo llegar a tu casa',
+                        prefixIcon: Icon(Icons.signpost_outlined),
                       ),
                     ),
 

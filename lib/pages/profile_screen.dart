@@ -85,7 +85,7 @@ class ProfileView extends StatelessWidget {
 
     final missing = <String>[
       if (phone.isEmpty) 'teléfono',
-      if (direccion.isEmpty) 'dirección',
+      if (direccion.isEmpty) 'referencia de ubicación',
       if (ubicacion == null) 'ubicación en el mapa',
     ];
 
@@ -186,11 +186,11 @@ class ProfileView extends StatelessWidget {
               ),
               const Divider(height: 1, indent: 56),
               _InfoTile(
-                icon: Icons.home_outlined,
-                label: 'Dirección',
+                icon: Icons.signpost_outlined,
+                label: 'Referencia de ubicación',
                 value: direccion,
-                empty: 'Agrega tu dirección',
-                onTap: () => _edit(context),
+                empty: 'Agrega cómo llegar a tu casa',
+                onTap: () => _editReferencia(context, direccion),
               ),
             ],
           ),
@@ -244,6 +244,37 @@ class ProfileView extends StatelessWidget {
   static String _join(List<String> items) {
     if (items.length == 1) return items.first;
     return '${items.sublist(0, items.length - 1).join(', ')} y ${items.last}';
+  }
+
+  /// Edita la referencia de ubicación (se guarda en `users.direccion`).
+  Future<void> _editReferencia(BuildContext context, String actual) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final texto = await showDialog<String>(
+      context: context,
+      builder: (_) => _ReferenciaDialog(initial: actual),
+    );
+    if (texto == null || texto == actual) return;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+        'direccion': texto,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Referencia de ubicación guardada')),
+      );
+    } on FirebaseException catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            e.code == 'unavailable'
+                ? 'Sin conexión. Revisa tu internet e inténtalo de nuevo.'
+                : 'No pudimos guardar la referencia. Inténtalo de nuevo.',
+          ),
+        ),
+      );
+    }
   }
 
   void _edit(BuildContext context) => Navigator.push(
@@ -437,6 +468,73 @@ class _SectionTitle extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
       ),
+    );
+  }
+}
+
+/// Diálogo para escribir la referencia de ubicación.
+class _ReferenciaDialog extends StatefulWidget {
+  final String initial;
+  const _ReferenciaDialog({required this.initial});
+
+  @override
+  State<_ReferenciaDialog> createState() => _ReferenciaDialogState();
+}
+
+class _ReferenciaDialogState extends State<_ReferenciaDialog> {
+  late final _ctrl = TextEditingController(text: widget.initial);
+  final _form = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    if (_form.currentState!.validate()) Navigator.pop(context, _ctrl.text.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Referencia de ubicación'),
+      content: Form(
+        key: _form,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Ayuda al repartidor a encontrar tu casa.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _ctrl,
+              autofocus: true,
+              minLines: 2,
+              maxLines: 4,
+              maxLength: 300,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(
+                hintText:
+                    'Ej: Los Cocos, calle 3, casa verde de dos pisos frente al colmado',
+              ),
+              validator: (v) => (v ?? '').trim().length < 5
+                  ? 'Escribe al menos el sector y una referencia'
+                  : null,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(onPressed: _save, child: const Text('Guardar')),
+      ],
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../pages/location_picker_screen.dart';
 import '../services/delivery_zone.dart';
+import '../services/location_errors.dart';
 import '../services/location_service.dart';
 import '../theme/app_theme.dart';
 
@@ -41,15 +42,7 @@ class _LocationCardState extends State<LocationCard> {
         );
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'No se pudo guardar: ${e.toString().replaceFirst('Exception: ', '')}',
-            ),
-          ),
-        );
-      }
+      if (mounted) await showLocationError(context, e);
     } finally {
       if (mounted) setState(() => _saving = false);
     }

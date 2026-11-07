@@ -248,8 +248,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       // Campo Dirección
                       _buildTextField(
                         controller: direccionCtrl,
-                        label: 'Dirección de entrega',
-                        icon: Icons.location_on_outlined,
+                        label: 'Referencia de ubicación',
+                        icon: Icons.signpost_outlined,
                         keyboardType: TextInputType.streetAddress,
                         maxLines: 2,
                       ),
