@@ -1,5 +1,7 @@
 import 'package:latlong2/latlong.dart';
 
+import '../services/delivery_zone.dart';
+
 /// Datos de entrega y pago que el cliente indica al confirmar el pedido.
 /// Se guardan dentro del pedido (`orders.entrega` y `orders.pago`) para que
 /// el repartidor los vea sin depender del perfil del usuario.
@@ -39,6 +41,12 @@ class CheckoutData {
     this.pagaCon,
     this.ubicacion,
   });
+
+  /// Cargo del delivery: solo cuando se lo llevamos a casa.
+  double get costoEnvio => tipo == TipoEntrega.delivery ? costoDelivery : 0;
+
+  /// Total a pagar: productos + delivery.
+  double totalCon(double subtotal) => subtotal + costoEnvio;
 
   double devuelta(double total) =>
       pagaCon == null ? 0 : (pagaCon! - total).clamp(0, double.infinity);

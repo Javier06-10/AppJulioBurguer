@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../services/order_service.dart';
+import '../services/delivery_zone.dart';
 import '../widgets/checkout_sheet.dart';
 import '../widgets/verify_email_dialog.dart';
 import '../services/store_status.dart';
@@ -30,7 +31,7 @@ class _CartScreenState extends State<CartScreen> {
     try {
       await orderService.createOrder(
         items: cart.items.values.toList(),
-        total: cart.total,
+        subtotal: cart.total,
         tiempoEstimado: tiempoEstimado,
         description: descriptionCtrl.text.trim(),
         checkout: checkout,
@@ -141,11 +142,16 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Total: RD\$ ${cart.total.toStringAsFixed(2)}',
+                        'Subtotal: RD\$ ${cart.total.toStringAsFixed(2)}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '+ RD\$ ${costoDelivery.toStringAsFixed(0)} de delivery si te lo llevamos',
+                        style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 12),
                       StreamBuilder<StoreStatus>(
