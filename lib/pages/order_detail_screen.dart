@@ -37,6 +37,7 @@ class OrderDetailScreen extends StatelessWidget {
 
     final String status = data['status'] ?? 'pending';
     final double total = (data['total'] as num?)?.toDouble() ?? 0.0;
+    final double envio = (data['envio'] as num?)?.toDouble() ?? 0.0;
     final Timestamp? createdAt = data['createdAt'];
     final description = data['description']?.toString();
     final int tiempoEstimado = data['tiempoEstimado'] ?? 0;
@@ -104,6 +105,11 @@ class OrderDetailScreen extends StatelessWidget {
             const SizedBox(height: 10),
 
             // 💰 TOTAL
+            if (envio > 0)
+              Text(
+                'Incluye delivery: RD\$ ${envio.toStringAsFixed(2)}',
+                style: TextStyle(color: Colors.grey.shade500),
+              ),
             Text(
               'Total: RD\$ ${total.toStringAsFixed(2)}',
               style: const TextStyle(

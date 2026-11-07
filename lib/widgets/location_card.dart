@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../pages/location_picker_screen.dart';
+import '../services/delivery_zone.dart';
 import '../services/location_service.dart';
 import '../theme/app_theme.dart';
 
@@ -58,6 +59,7 @@ class _LocationCardState extends State<LocationCard> {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final loc = widget.location;
+    final fuera = loc != null && !DeliveryZone.contiene(loc);
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -106,8 +108,16 @@ class _LocationCardState extends State<LocationCard> {
             child: Row(
               children: [
                 Icon(
-                  loc == null ? Icons.add_location_alt_outlined : Icons.place,
-                  color: loc == null ? AppColors.textMuted : AppColors.success,
+                  loc == null
+                      ? Icons.add_location_alt_outlined
+                      : fuera
+                      ? Icons.wrong_location_outlined
+                      : Icons.place,
+                  color: loc == null
+                      ? AppColors.textMuted
+                      : fuera
+                      ? Colors.redAccent
+                      : AppColors.success,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -117,12 +127,16 @@ class _LocationCardState extends State<LocationCard> {
                       Text(
                         loc == null
                             ? 'Sin ubicación en el mapa'
+                            : fuera
+                            ? 'Fuera de la zona de delivery'
                             : 'Ubicación de entrega guardada',
                         style: t.titleMedium,
                       ),
                       Text(
                         loc == null
                             ? 'Marca tu puerta para que el delivery llegue sin perderse'
+                            : fuera
+                            ? 'Solo entregamos en ${DeliveryZone.nombre}'
                             : 'El repartidor verá este punto exacto',
                         style: t.bodySmall,
                       ),

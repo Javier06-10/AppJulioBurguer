@@ -6,25 +6,27 @@ import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../models/checkout_data.dart';
+import '../services/delivery_zone.dart';
 import '../services/location_service.dart';
 import '../theme/app_theme.dart';
 import 'location_card.dart';
 
 /// Abre la hoja de confirmación y devuelve los datos elegidos (o null si se cancela).
-Future<CheckoutData?> showCheckoutSheet(BuildContext context, double total) {
+/// [subtotal] es lo que suman los productos; el delivery se suma aquí.
+Future<CheckoutData?> showCheckoutSheet(BuildContext context, double subtotal) {
   return showModalBottomSheet<CheckoutData>(
     context: context,
     isScrollControlled: true,
     builder: (_) => Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: _CheckoutSheet(total: total),
+      child: _CheckoutSheet(subtotal: subtotal),
     ),
   );
 }
 
 class _CheckoutSheet extends StatefulWidget {
-  final double total;
-  const _CheckoutSheet({required this.total});
+  final double subtotal;
+  const _CheckoutSheet({required this.subtotal});
 
   @override
   State<_CheckoutSheet> createState() => _CheckoutSheetState();
@@ -42,6 +44,10 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
   MetodoPago _metodo = MetodoPago.efectivo;
   LatLng? _ubicacion;
   bool _loading = true;
+  String? _ubicacionError;
+
+  double get _envio => _tipo == TipoEntrega.delivery ? costoDelivery : 0;
+  double get _total => widget.subtotal + _envio;
 
   @override
   void initState() {
@@ -79,7 +85,7 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
 
   /// Billetes sugeridos por encima del total.
   List<double> get _quickCash {
-    final t = widget.total;
+    final t = _total;
     final options = <double>{
       for (final step in [100, 500, 1000, 2000])
         if (step >= t / 4) (t / step).ceil() * step.toDouble(),
@@ -88,7 +94,9 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
   }
 
   void _confirm() {
-    if (!_formKey.currentState!.validate()) return;
+    final formOk = _formKey.currentState!.validate();
+    setState(() => _ubicacionError = _validarUbicacion());
+    if (!formOk || _ubicacionError != null) return;
     Navigator.pop(
       context,
       CheckoutData(
@@ -104,13 +112,37 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
     );
   }
 
+  /// El delivery solo llega dentro de la zona y necesita el punto en el mapa.
+  String? _validarUbicacion() {
+    if (_tipo != TipoEntrega.delivery) return null;
+    final p = _ubicacion;
+    if (p == null) {
+      return 'Marca en el mapa dónde te entregamos';
+    }
+    if (!DeliveryZone.contiene(p)) {
+      return 'Esa ubicación está fuera de nuestra zona de delivery '
+          '(${DeliveryZone.nombre}). Elige otra o recoge en el local.';
+    }
+    return null;
+  }
+
   String _money(double v) => 'RD\$ ${v.toStringAsFixed(2)}';
+
+  Widget _row(String label, String value, TextStyle? style) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 2),
+    child: Row(
+      children: [
+        Expanded(child: Text(label, style: style)),
+        Text(value, style: style),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final pagaCon = _pagaConValue;
-    final devuelta = pagaCon == null ? 0.0 : pagaCon - widget.total;
+    final devuelta = pagaCon == null ? 0.0 : pagaCon - _total;
 
     if (_loading) {
       return const SizedBox(
@@ -128,9 +160,13 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
           children: [
             Text('Confirmar pedido', style: t.headlineSmall),
             const SizedBox(height: 4),
-            Text(
-              'Total a pagar: ${_money(widget.total)}',
-              style: t.bodyMedium?.copyWith(color: AppColors.primary),
+            _row('Productos', _money(widget.subtotal), t.bodyMedium),
+            if (_tipo == TipoEntrega.delivery)
+              _row('Delivery', _money(_envio), t.bodyMedium),
+            _row(
+              'Total a pagar',
+              _money(_total),
+              t.titleMedium?.copyWith(color: AppColors.primary),
             ),
             const SizedBox(height: 20),
 
@@ -149,7 +185,10 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
                 ),
               ],
               selected: {_tipo},
-              onSelectionChanged: (s) => setState(() => _tipo = s.first),
+              onSelectionChanged: (s) => setState(() {
+                _tipo = s.first;
+                _ubicacionError = null;
+              }),
             ),
             const SizedBox(height: 16),
 
@@ -209,7 +248,21 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
               const SizedBox(height: 12),
               LocationCard(
                 location: _ubicacion,
-                onChanged: (p) => setState(() => _ubicacion = p),
+                onChanged: (p) => setState(() {
+                  _ubicacion = p;
+                  _ubicacionError = null;
+                }),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 6, left: 4),
+                child: Text(
+                  _ubicacionError ??
+                      'Llevamos pedidos solo en ${DeliveryZone.nombre}. '
+                          'Delivery: ${_money(costoDelivery)}.',
+                  style: t.bodySmall?.copyWith(
+                    color: _ubicacionError != null ? Colors.redAccent : null,
+                  ),
+                ),
               ),
             ],
 
@@ -248,7 +301,7 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
                   if (v == null || v.trim().isEmpty) return null;
                   final n = double.tryParse(v.replaceAll(',', '.'));
                   if (n == null) return 'Monto inválido';
-                  if (n < widget.total) {
+                  if (n < _total) {
                     return 'Debe ser igual o mayor al total';
                   }
                   return null;
@@ -304,8 +357,8 @@ class _CheckoutSheetState extends State<_CheckoutSheet> {
               icon: const Icon(Icons.check),
               label: Text(
                 _tipo == TipoEntrega.delivery
-                    ? 'Pedir delivery · ${_money(widget.total)}'
-                    : 'Confirmar pedido · ${_money(widget.total)}',
+                    ? 'Pedir delivery · ${_money(_total)}'
+                    : 'Confirmar pedido · ${_money(_total)}',
               ),
             ),
           ],
