@@ -33,6 +33,6 @@ flutter config --no-analytics --enable-web
 flutter --version
 
 flutter pub get
-flutter build web --release
+flutter build web --release --dart-define=PANEL_URL="${PANEL_URL:-}"
 
 echo "Build listo en build/web"

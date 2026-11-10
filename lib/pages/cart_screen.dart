@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../services/order_service.dart';
 import '../services/delivery_zone.dart';
+import '../services/order_email.dart';
 import '../widgets/checkout_sheet.dart';
 import '../widgets/verify_email_dialog.dart';
 import '../services/store_status.dart';
@@ -39,8 +40,12 @@ class _CartScreenState extends State<CartScreen> {
       cart.clear();
       if (mounted) Navigator.pop(context);
       messenger.showSnackBar(
-        const SnackBar(
-          content: Text('¡Pedido enviado! Te avisaremos cuando esté listo.'),
+        SnackBar(
+          content: Text(
+            panelUrl.isEmpty
+                ? '¡Pedido enviado! Te avisaremos cuando esté listo.'
+                : '¡Pedido enviado! Te mandamos el detalle a tu correo y te avisaremos cuando esté listo.',
+          ),
         ),
       );
     } on OrderRejected catch (e) {

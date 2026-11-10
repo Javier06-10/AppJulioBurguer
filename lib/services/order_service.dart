@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/checkout_data.dart';
 import '../models/models/cart_item.dart';
 import 'delivery_zone.dart';
+import 'order_email.dart';
 import 'store_status.dart';
 
 /// Límites contra pedidos falsos. Deben coincidir con las reglas de
@@ -65,8 +68,9 @@ class OrderService {
   }
 
   /// Crea el pedido y, en la misma escritura, actualiza el registro de
-  /// pedidos del cliente (las reglas exigen ambos juntos).
-  Future<void> createOrder({
+  /// pedidos del cliente (las reglas exigen ambos juntos). Después pide al
+  /// panel que le envíe al cliente un correo con lo que pidió.
+  Future<String> createOrder({
     required List<CartItem> items,
     required double subtotal,
     required int tiempoEstimado,
@@ -150,5 +154,9 @@ class OrderService {
             : ((perfil['pedidosVentana'] as num?)?.toInt() ?? 0) + 1,
       });
     });
+
+    // El correo sale en segundo plano: el pedido ya quedó guardado
+    unawaited(sendOrderEmail(orderRef.id));
+    return orderRef.id;
   }
 }
